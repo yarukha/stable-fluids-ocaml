@@ -1,0 +1,8 @@
+lib: [
+  "_build/install/default/lib/graphml/META"
+  "_build/install/default/lib/graphml/dune-package"
+  "_build/install/default/lib/graphml/opam"
+]
+bin: [
+  "_build/install/default/bin/graphml"
+]

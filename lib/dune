@@ -1,0 +1,4 @@
+(library
+ (name graphml)
+ (libraries owl lablgl.glut landmarks)
+ (preprocess (pps landmarks-ppx --auto)))
