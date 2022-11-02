@@ -7,7 +7,7 @@ let om_x = ref 0
 let om_y = ref 0
 let mouse = Array.make 3 false
 
-let visc = 0.0001
+let visc = 0.00001
 let dt =0.1 
 let a = visc *. dt
 let h = 1./.(1. +. (4.*. a))
@@ -18,10 +18,13 @@ let n = 128
 let fps = 60
 let t_update = 1000 / 60
 
-let def_density_source = 100.
+let def_density_source = 1.
 let def_force_source = 2.
 let periodic = ref false
 let display_dens = ref true
+let horizontal_force = ref false
+
+
 
 let t= ref 0.
 let image_count = ref 0

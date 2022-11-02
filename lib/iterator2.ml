@@ -24,9 +24,8 @@ let init_grid = Array2.init kind layout
 let init_field = Array3.init kind layout
 
 
-
 let density_source = init_grid m m (fun _ _ -> 0.)
-let force_source = init_field m m 2 (fun _ _ l-> if l = 0 then -0.01 else 0.) 
+let force_source = init_field m m 2 (fun _ _ _ -> 0.) 
 
 let dens = init_grid m m (fun _ _ -> 0.)
 let vel = init_field m m 2 (fun _ _ _-> 0.)
@@ -57,7 +56,7 @@ let set_bound_grid f =
     f.{n+1,i}<-f.{n,i};
     f.{i,n+1}<-f.{i,n};
   done end;
-  Variables.iter_obstacles (fun (i,j)-> f.{i,j}<-0.);
+  Variables.iter_obstacles (fun (i,j)-> if (i>=1)&&(i<=n)&&(j>=1)&&(j<=n) then f.{i,j}<-0.);
   f.{0,0}<-0.5 *. (f.{1,0}+. f.{0,1});
   f.{0,n+1}<-0.5 *. (f.{1,n+1}+.f.{0,n});
   f.{n+1,0}<-0.5 *. (f.{n,0}+.f.{n+1,1}) ;
@@ -80,7 +79,7 @@ let set_bound_field w =
     w.{n+1,i,0}<- -.w.{n,i,0};    w.{n+1,i,1}<- w.{n,i,1};
     w.{i,n+1,0}<- w.{i,n,0};    w.{i,n+1,1}<- -.w.{i,n,1};
   done;
-  Variables.iter_obstacles (fun (i,j)-> w.{i,j,0}<-0.;w.{i,j,1}<-0.);
+  Variables.iter_obstacles (fun (i,j)->if ((i>=1)&&(i<=n)&&(j>=1)&&(j<=n)) then (w.{i,j,0}<-0.;w.{i,j,1}<-0.) else ());
   w.{0,0,0}<-0.5 *. (w.{1,0,0}+. w.{0,1,0});      w.{0,0,1}<-0.5 *. (w.{1,0,1}+. w.{0,1,1});
   w.{0,n+1,0}<-0.5 *. (w.{1,n+1,0}+.w.{0,n,0});  w.{0,n+1,1}<-0.5 *. (w.{1,n+1,1}+.w.{0,n,1});
   w.{n+1,0,0}<-0.5 *. (w.{n,0,0}+.w.{n+1,1,0}) ;  w.{n+1,0,1}<-0.5 *. (w.{n,0,1}+.w.{n+1,1,1}) ;
@@ -98,7 +97,14 @@ let add_force () =
   for i = 0 to n+1 do 
     for j = 0 to n+1 do 
       vel.{i,j,0}<-vel.{i,j,0}+. (dt *. force_source.{i,j,0});
-      vel.{i,j,1}<-vel.{i,j,1}+. (dt *. force_source.{i,j,1})
+      vel.{i,j,1}<-vel.{i,j,1}+. (dt *. force_source.{i,j,1}) 
+    done;
+  done
+
+let add_h_force () = 
+  for i = 0 to n+1 do 
+    for j = 0 to n+1 do 
+      vel.{i,j,0}<-vel.{i,j,0} -. 0.1;
     done;
   done
 
@@ -224,7 +230,6 @@ let print_field f =
   done
 let step () = 
   step_velocity ();
-  print_field force_source;
   step_density ()
 
 

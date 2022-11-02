@@ -53,14 +53,14 @@ let update_left_click i j =
     Grid.set Iterator2.dens i j Variables.def_density_source
 
 let update_right_click i j = 
-  if Variables.mouse.(2) then 
+  if Variables.mouse.(2) then begin
     Field.set Iterator2.vel i j 0 Variables.(def_force_source *. float_of_int (!m_x - !om_x));
-    Field.set Iterator2.vel i j 1 Variables.(def_force_source *. float_of_int (!m_y - !om_y))
+    Field.set Iterator2.vel i j 1 Variables.(def_force_source *. float_of_int (!om_y - !m_y)) end
 
 let update_middle_click i j = 
   if Variables.mouse.(1) then 
-    for i' = max 1 (i-3) to min n (i+3) do 
-      for j' = max 1 (j-3) to min n (j+3) do 
+    for i' = (i-3) to (i+3) do 
+      for j' = (j-3) to (j+3) do 
         if Variables.find_obstacle i' j' then 
           Variables.remove_obstacle i' j' 
         else 
@@ -98,6 +98,7 @@ let key_func = fun ~key ~x ~y ->
       |100->Variables.display_dens:= not !Variables.display_dens
       |99->Grid.fill Iterator2.dens 0.; Field.fill Iterator2.vel 0.;Variables.reset_obstacles ()
       |112->Variables.periodic := not !Variables.periodic
+      |104->Iterator2.add_h_force (); 
       |27(*esc*) -> exit 0
       | _ -> ()
 
@@ -158,7 +159,7 @@ let rec time_func =
     incr Variables.image_count;
     let new_t = Unix.gettimeofday () in 
     if new_t -. !Variables.t > 1. then begin
-      Format.printf "FPS:%i\n%!" !Variables.image_count;
+      Glut.setWindowTitle ~title:(Format.sprintf "Stable Fluids - %i" !Variables.image_count);
       Variables.image_count:=0;
       Variables.t:=new_t
     end else ();
@@ -177,7 +178,7 @@ let main () =
 
   Variables.t := Unix.gettimeofday ();
   Variables.image_count := 0;
-  Format.printf "\n-Esc to quit\n-Left click to add density\n-Right click to add force\n-d to change display\n-pto set periodicity\n-c to reset\n%!";
+  Format.printf "\n-Esc to quit\n-Left click to add density\n-Right click to add force\n-Middle click to add obstacle\n-d to change display\n-p to set periodicity\n-h to set horizontal_force\n-c to reset\n%!";
   Glut.keyboardFunc ~cb:key_func;
   Glut.mouseFunc ~cb:mouse_func;
   Glut.motionFunc ~cb:motion_func;
